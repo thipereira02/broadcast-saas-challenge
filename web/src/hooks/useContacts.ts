@@ -28,17 +28,25 @@ export function useContacts(connectionId: string | undefined) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || !connectionId) {
+    if (!user) {
       setContacts([]);
       setLoading(false);
       return;
     }
 
-    const q = query(
-      collection(db, "contacts"),
-      where("connectionId", "==", connectionId),
-      where("userId", "==", user.uid)
-    );
+    let q;
+    if (connectionId) {
+      q = query(
+        collection(db, "contacts"),
+        where("connectionId", "==", connectionId),
+        where("userId", "==", user.uid)
+      );
+    } else {
+      q = query(
+        collection(db, "contacts"),
+        where("userId", "==", user.uid)
+      );
+    }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((doc) => ({
@@ -76,7 +84,6 @@ export function useContacts(connectionId: string | undefined) {
     }
   };
 
-  // DELETE
   const removeContact = async (id: string) => {
     try {
       await deleteDoc(doc(db, "contacts", id));

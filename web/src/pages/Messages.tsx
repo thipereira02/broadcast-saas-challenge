@@ -3,19 +3,86 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useConnections } from "../hooks/useConnections";
 import { useContacts } from "../hooks/useContacts";
-import { useMessages } from "../hooks/useMessages";
+import { useMessages, type Message } from "../hooks/useMessages";
 import { 
   Button, TextField, Dialog, DialogActions, DialogContent, 
   DialogTitle, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, IconButton,
-  Tabs, Tab, Box, MenuItem, Checkbox, ListItemText, OutlinedInput, Select, FormControl, InputLabel
+  Tabs, Tab, Box, MenuItem, Checkbox, ListItemText, OutlinedInput, Select, FormControl, InputLabel,
+  Collapse, Typography
 } from "@mui/material";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from '@mui/icons-material/Send';
-import ScheduleSendIcon from '@mui/icons-material/ScheduleSend';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Timestamp } from "firebase/firestore";
 import toast from "react-hot-toast";
+
+function MessageRow({ msg, onDelete, allContacts }: { msg: Message, onDelete: (id: string) => void, allContacts: any[] }) {
+  const [open, setOpen] = useState(false);
+
+  const contactNames = useMemo(() => {
+    return msg.contactIds.map(id => {
+      const contact = allContacts.find(c => c.id === id);
+      return contact ? contact.name : "Contato removido";
+    }).join(", ");
+  }, [msg.contactIds, allContacts]);
+
+  return (
+    <>
+      <TableRow hover sx={{ '& > *': { borderBottom: 'unset' } }}>
+        <TableCell width={50}>
+          <IconButton size="small" onClick={() => setOpen(!open)}>
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell className="max-w-[300px] truncate font-medium text-slate-700">
+          {msg.text}
+        </TableCell>
+        <TableCell className="text-slate-500 font-bold">
+          {msg.contactIds.length} pessoas
+        </TableCell>
+        <TableCell className="text-slate-500">
+          {msg.scheduledAt.toDate().toLocaleString('pt-BR')}
+        </TableCell>
+        <TableCell align="right">
+          <IconButton color="error" size="small" onClick={() => onDelete(msg.id)}>
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </TableCell>
+      </TableRow>
+      
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box className="p-6 bg-slate-50/50 rounded-2xl my-3 border border-slate-100 shadow-inner">
+              <div className="space-y-5">
+                <div>
+                  <Typography className="text-blue-600 font-black uppercase text-[10px] tracking-[2px] mb-1">
+                    Para
+                  </Typography>
+                  <Typography className="text-slate-800 font-semibold text-sm leading-relaxed">
+                    {contactNames}
+                  </Typography>
+                </div>
+
+                <div>
+                  <Typography className="text-blue-600 font-black uppercase text-[10px] tracking-[2px] mb-1">
+                    Mensagem
+                  </Typography>
+                  <div className="bg-white p-4 rounded-xl border border-slate-200 text-slate-700 text-sm whitespace-pre-wrap leading-relaxed shadow-sm">
+                    {msg.text}
+                  </div>
+                </div>
+              </div>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
+  );
+}
 
 export function Messages() {
   const { user, logout } = useAuth();
@@ -30,7 +97,9 @@ export function Messages() {
   const [text, setText] = useState("");
   const [scheduleTime, setScheduleTime] = useState("");
 
-  const { contacts } = useContacts(selectedConnId || undefined);
+  const { contacts: modalContacts } = useContacts(selectedConnId || undefined);
+  
+  const { contacts: allContacts } = useContacts(undefined);
 
   const filteredMessages = useMemo(() => {
     const status = tabValue === 0 ? 'sent' : 'scheduled';
@@ -74,15 +143,11 @@ export function Messages() {
     <div className="min-h-screen bg-slate-50 font-sans">
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-4">
-          <IconButton 
-            onClick={() => navigate("/")} 
-            size="small" 
-            className="text-slate-400 hover:text-blue-600 transition-colors"
-          >
+          <IconButton onClick={() => navigate("/")} size="small" className="text-slate-400 hover:text-blue-600">
             <ArrowBackIosNewIcon fontSize="small" />
           </IconButton>
           <div className="flex items-center gap-3 border-l pl-4 border-slate-200">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/20">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
               <span className="text-white font-bold text-lg">O</span>
             </div>
             <span className="text-slate-800 text-xl font-extrabold tracking-tight">Omnisend</span>
@@ -119,36 +184,25 @@ export function Messages() {
           </Tabs>
         </Box>
 
-        {/* Tabela de Mensagens */}
-        <TableContainer component={Paper} className="rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <TableContainer component={Paper} className="rounded-2xl border border-slate-200 shadow-sm overflow-hidden bg-white">
           <Table>
             <TableHead className="bg-slate-50">
               <TableRow>
-                <TableCell className="font-bold text-slate-600 text-xs uppercase">Mensagem</TableCell>
-                <TableCell className="font-bold text-slate-600 text-xs uppercase">Destinatários</TableCell>
-                <TableCell className="font-bold text-slate-600 text-xs uppercase">Data/Hora</TableCell>
-                <TableCell align="right" className="font-bold text-slate-600 text-xs uppercase">Ações</TableCell>
+                <TableCell width={50} />
+                <TableCell className="font-bold text-slate-600 text-xs uppercase tracking-widest">Resumo</TableCell>
+                <TableCell className="font-bold text-slate-600 text-xs uppercase tracking-widest">Alvo</TableCell>
+                <TableCell className="font-bold text-slate-600 text-xs uppercase tracking-widest">Horário</TableCell>
+                <TableCell align="right" className="font-bold text-slate-600 text-xs uppercase tracking-widest">Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredMessages.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} align="center" className="py-16 text-slate-400">
-                    Nenhuma mensagem nesta categoria.
-                  </TableCell>
+                  <TableCell colSpan={5} align="center" className="py-16 text-slate-400">Nenhuma mensagem aqui.</TableCell>
                 </TableRow>
               ) : (
                 filteredMessages.map((msg) => (
-                  <TableRow key={msg.id} hover>
-                    <TableCell className="max-w-xs truncate font-medium text-slate-700">{msg.text}</TableCell>
-                    <TableCell className="text-slate-500">{msg.contactIds.length} contato(s)</TableCell>
-                    <TableCell className="text-slate-500">{msg.scheduledAt.toDate().toLocaleString('pt-BR')}</TableCell>
-                    <TableCell align="right">
-                      <IconButton color="error" size="small" onClick={() => deleteMessage(msg.id)}>
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
+                  <MessageRow key={msg.id} msg={msg} onDelete={deleteMessage} allContacts={allContacts} />
                 ))
               )}
             </TableBody>
@@ -158,7 +212,6 @@ export function Messages() {
         <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ className: "rounded-2xl" }}>
           <DialogTitle className="font-extrabold text-slate-800 text-xl">Configurar Disparo</DialogTitle>
           <DialogContent className="flex flex-col gap-6 pt-4">
-            
             <TextField
               select label="Selecione o Remetente"
               fullWidth value={selectedConnId}
@@ -178,7 +231,7 @@ export function Messages() {
                 input={<OutlinedInput label="Selecionar Destinatários" className="rounded-xl" />}
                 renderValue={(selected) => `${selected.length} contatos selecionados`}
               >
-                {contacts.map((contact) => (
+                {modalContacts.map((contact) => (
                   <MenuItem key={contact.id} value={contact.id}>
                     <Checkbox checked={selectedContactIds.indexOf(contact.id) > -1} />
                     <ListItemText primary={contact.name} secondary={contact.phone} />
@@ -208,12 +261,7 @@ export function Messages() {
           </DialogContent>
           <DialogActions className="p-6">
             <Button onClick={() => setOpen(false)} className="text-slate-500 font-bold capitalize">Cancelar</Button>
-            <Button 
-              variant="contained" 
-              onClick={handleSend}
-              startIcon={scheduleTime ? <ScheduleSendIcon /> : <SendIcon />}
-              className="bg-blue-600 hover:bg-blue-700 rounded-xl px-8 font-bold capitalize"
-            >
+            <Button variant="contained" onClick={handleSend} className="bg-blue-600 hover:bg-blue-700 rounded-xl px-8 font-bold capitalize">
               {scheduleTime ? "Confirmar Agendamento" : "Enviar Agora"}
             </Button>
           </DialogActions>
