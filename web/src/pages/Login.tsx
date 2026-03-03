@@ -11,7 +11,8 @@ export function Login() {
   const [loadingAction, setLoadingAction] = useState(false);
 
   const handleSubmit = async () => {
-    if (!email || !email.includes("@") || !email.includes(".")) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
       toast.error("Por favor, insira um e-mail válido.");
       return;
     }
