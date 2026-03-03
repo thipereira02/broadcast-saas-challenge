@@ -1,104 +1,107 @@
 import { useState } from "react";
-import { toast } from "react-hot-toast";
-import { TextField, Button, Typography, Paper } from "@mui/material";
 import { useAuth } from "../hooks/useAuth";
+import { Button, TextField } from "@mui/material";
 
 export function Login() {
-  const { login, register } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loadingAction, setLoadingAction] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const { login } = useAuth();
 
-  const handleSubmit = async () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast.error("Por favor, insira um e-mail válido.");
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError(false);
+
+    if (!validateEmail(email)) {
+      setEmailError(true);
       return;
     }
-    if (password.length < 6) {
-      toast.error("A senha deve ter pelo menos 6 caracteres.");
-      return;
-    }
 
-    setLoadingAction(true);
-    try {
-      if (isLogin) {
-        await login(email, password);
-        toast.success("Bem-vindo de volta!");
-      } else {
-        await register(email, password);
-        toast.success("Conta criada com sucesso! Faça o login para continuar.");
-        setIsLogin(true);
-        setPassword("");
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingAction(false);
-    }
+    await login(email, password);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <Paper elevation={3} className="p-8 w-full max-w-md flex flex-col gap-6">
-        <Typography variant="h4" component="h1" className="text-center font-bold text-gray-800">
-          Broadcast SaaS
-        </Typography>
+    <div className="min-h-screen flex w-full bg-white font-sans">
+      <div className="hidden lg:flex w-1/2 bg-slate-900 p-12 flex-col justify-between relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/20 to-purple-600/20 z-0"></div>
         
-        <Typography variant="subtitle1" className="text-center text-gray-600 mb-4">
-          {isLogin ? "Acesse sua conta" : "Crie uma nova conta"}
-        </Typography>
-
-        <form 
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }} 
-          className="flex flex-col gap-4"
-          noValidate
-        >
-          <TextField
-            label="E-mail"
-            type="email"
-            variant="outlined"
-            fullWidth
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            label="Senha"
-            type="password"
-            variant="outlined"
-            fullWidth
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <Button 
-            type="submit" 
-            variant="contained" 
-            color="primary" 
-            size="large"
-            disabled={loadingAction}
-            className="mt-2 h-12"
-          >
-            {loadingAction ? "Processando..." : (isLogin ? "Entrar" : "Cadastrar")}
-          </Button>
-        </form>
-
-        <div className="text-center mt-4">
-          <button 
-            type="button"
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:underline text-sm font-medium"
-          >
-            {isLogin ? "Não tem uma conta? Cadastre-se" : "Já tem uma conta? Faça login"}
-          </button>
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-16">
+            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <span className="text-white font-bold text-2xl">O</span>
+            </div>
+            <span className="text-white text-2xl font-bold tracking-tight">OmniSend</span>
+          </div>
+          
+          <h1 className="text-5xl font-extrabold text-white leading-tight mb-6">
+            Simplifique seus <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+              disparos em massa.
+            </span>
+          </h1>
+          <p className="text-slate-300 text-lg max-w-md leading-relaxed">
+            A plataforma definitiva para gerenciar suas conexões e alcançar seus clientes em tempo recorde e sem estresse.
+          </p>
         </div>
-      </Paper>
+        
+        <div className="relative z-10 text-slate-500 text-sm font-medium">
+          © 2026 OmniSend. Todos os direitos reservados.
+        </div>
+      </div>
+
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-slate-50">
+        <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
+          <div className="mb-8 text-center lg:text-left">
+            <h2 className="text-3xl font-extrabold text-slate-800 mb-2">Bem-vindo</h2>
+            <p className="text-slate-500 font-medium">Acesse sua conta para continuar.</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-5" noValidate>
+            <TextField
+              label="E-mail profissional"
+              type="email"
+              fullWidth
+              required
+              variant="outlined"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError(false);
+              }}
+              error={emailError}
+              helperText={emailError ? "Por favor, insira um e-mail válido." : ""}
+              InputProps={{ className: "bg-slate-50 rounded-xl" }}
+            />
+            
+            <TextField
+              label="Senha"
+              type="password"
+              fullWidth
+              required
+              variant="outlined"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              InputProps={{ className: "bg-slate-50 rounded-xl" }}
+            />
+
+            <Button 
+              type="submit" 
+              variant="contained" 
+              size="large" 
+              fullWidth 
+              disableElevation
+              className="py-3.5 mt-2 bg-blue-600 hover:bg-blue-700 capitalize text-[15px] font-bold rounded-xl transition-all shadow-md shadow-blue-500/20"
+            >
+              Entrar no Painel
+            </Button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
