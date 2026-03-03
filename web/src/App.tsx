@@ -4,6 +4,7 @@ import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { Contacts } from "./pages/Contacts"
 import { PrivateRoute } from "./components/PrivateRoute";
+import { Messages } from "./pages/Messages";
 import { useAuth } from "./hooks/useAuth";
 
 export function App() {
@@ -37,6 +38,15 @@ export function App() {
             <PrivateRoute>
               <Contacts />
             </PrivateRoute>
+          } 
+        />
+
+        <Route 
+          path="/mensagens" 
+          element={
+            <PrivateRoute>
+                <Messages />
+              </PrivateRoute>
           } 
         />
         

@@ -11,6 +11,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import SendIcon from '@mui/icons-material/Send';
 import toast from "react-hot-toast";
 
 export function Dashboard() {
@@ -56,15 +57,18 @@ export function Dashboard() {
     <div className="min-h-screen bg-slate-50 font-sans">
       
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/20">
-            <span className="text-white font-bold text-lg">O</span>
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/20">
+              <span className="text-white font-bold text-lg">O</span>
+            </div>
+            <span className="text-slate-800 text-xl font-extrabold tracking-tight">Omnisend</span>
           </div>
-          <span className="text-slate-800 text-xl font-extrabold tracking-tight">Omnisend</span>
         </div>
+
         <div className="flex items-center gap-4">
           <span className="text-sm font-medium text-slate-500 hidden sm:block">{user?.email}</span>
-          <Button variant="outlined" size="small" onClick={logout} className="text-slate-600 border-slate-300 hover:bg-slate-50 rounded-lg">
+          <Button variant="outlined" size="small" onClick={logout} className="text-slate-600 border-slate-300 hover:bg-slate-50 rounded-lg capitalize">
             Sair
           </Button>
         </div>
@@ -77,15 +81,26 @@ export function Dashboard() {
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Conexões</h1>
             <p className="text-slate-500 mt-1 font-medium">Gerencie os números remetentes para os seus disparos.</p>
           </div>
-          <Button 
-            variant="contained" 
-            disableElevation 
-            onClick={() => setOpen(true)}
-            startIcon={<AddCircleOutlineIcon />}
-            className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 py-2.5 shadow-md shadow-blue-500/20 font-bold capitalize"
-          >
-            Nova Conexão
-          </Button>
+          
+          <div className="flex gap-3">
+            <Button 
+              variant="outlined"
+              onClick={() => navigate("/mensagens")}
+              startIcon={<SendIcon />}
+              className="text-blue-600 border-blue-200 hover:bg-blue-50 rounded-xl px-5 py-2.5 font-bold capitalize"
+            >
+              Ir para Mensagens
+            </Button>
+            <Button 
+              variant="contained" 
+              disableElevation 
+              onClick={() => setOpen(true)}
+              startIcon={<AddCircleOutlineIcon />}
+              className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 py-2.5 shadow-md shadow-blue-500/20 font-bold capitalize"
+            >
+              Nova Conexão
+            </Button>
+          </div>
         </div>
 
         <TableContainer component={Paper} className="shadow-sm border border-slate-200 rounded-2xl overflow-hidden bg-white">
@@ -164,7 +179,6 @@ export function Dashboard() {
                         <IconButton color="error" size="small" onClick={() => removeConnection(conn.id)} className="hover:bg-red-50">
                           <DeleteIcon fontSize="small" />
                         </IconButton>
-                        
                       </div>
                     </TableCell>
                   </TableRow>
