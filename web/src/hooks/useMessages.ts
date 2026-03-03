@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import { 
   collection, 
   query, 
@@ -10,10 +10,10 @@ import {
   updateDoc, 
   serverTimestamp, 
   Timestamp 
-} from "firebase/firestore";
-import { db } from "../services/firebase";
-import { useAuth } from "./useAuth";
-import toast from "react-hot-toast";
+} from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { useAuth } from './useAuth';
+import toast from 'react-hot-toast';
 
 export interface Message {
   id: string;
@@ -39,29 +39,29 @@ export function useMessages() {
       return;
     }
 
-    const q = query(collection(db, "messages"), where("userId", "==", user.uid));
+    const q = query(collection(db, 'messages'), where('userId', '==', user.uid));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-        const data = snapshot.docs.map(doc => ({ 
-            id: doc.id, 
-            ...doc.data() 
-        })) as Message[];
+      const data = snapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data() 
+      })) as Message[];
 
-        data.sort((a, b) => b.scheduledAt.toMillis() - a.scheduledAt.toMillis());
+      data.sort((a, b) => b.scheduledAt.toMillis() - a.scheduledAt.toMillis());
 
-        const now = Date.now();
-        data.forEach(async (msg) => {
-            if (msg.status === 'scheduled' && msg.scheduledAt.toDate().getTime() <= now) {
-              await updateDoc(doc(db, "messages", msg.id), { status: 'sent' });
-            }
-        });
+      const now = Date.now();
+      data.forEach(async (msg) => {
+        if (msg.status === 'scheduled' && msg.scheduledAt.toDate().getTime() <= now) {
+          await updateDoc(doc(db, 'messages', msg.id), { status: 'sent' });
+        }
+      });
 
-        setMessages(data);
-        setLoading(false);
+      setMessages(data);
+      setLoading(false);
     }, (_err) => {
-        console.error("Erro ao buscar mensagens:", _err);
-        toast.error("Erro ao sincronizar mensagens.");
-        setLoading(false);
+      console.error('Erro ao buscar mensagens:', _err);
+      toast.error('Erro ao sincronizar mensagens.');
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -70,25 +70,25 @@ export function useMessages() {
   const saveMessage = async (msgData: Omit<Message, 'id' | 'userId'>) => {
     if (!user) return;
     try {
-      await addDoc(collection(db, "messages"), {
+      await addDoc(collection(db, 'messages'), {
         ...msgData,
         userId: user.uid,
         createdAt: serverTimestamp()
       });
-      toast.success(msgData.status === 'sent' ? "Mensagem enviada!" : "Mensagem agendada!");
+      toast.success(msgData.status === 'sent' ? 'Mensagem enviada!' : 'Mensagem agendada!');
     } catch (_err) {
-      console.error("Erro ao salvar mensagem:", _err);
-      toast.error("Erro ao salvar mensagem.");
+      console.error('Erro ao salvar mensagem:', _err);
+      toast.error('Erro ao salvar mensagem.');
     }
   };
 
   const deleteMessage = async (id: string) => {
     try {
-      await deleteDoc(doc(db, "messages", id));
-      toast.success("Mensagem removida.");
+      await deleteDoc(doc(db, 'messages', id));
+      toast.success('Mensagem removida.');
     } catch (_err) {
-      console.error("Erro ao remover mensagem:", _err);
-      toast.error("Erro ao remover.");
+      console.error('Erro ao remover mensagem:', _err);
+      toast.error('Erro ao remover.');
     }
   };
 

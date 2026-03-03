@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { useAuth } from "../hooks/useAuth";
-import { Button, TextField } from "@mui/material";
+import { useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { Button, TextField } from '@mui/material';
 
 export function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState(false);
   const { login } = useAuth();
 
@@ -74,8 +74,8 @@ export function Login() {
                 if (emailError) setEmailError(false);
               }}
               error={emailError}
-              helperText={emailError ? "Por favor, insira um e-mail válido." : ""}
-              InputProps={{ className: "bg-slate-50 rounded-xl" }}
+              helperText={emailError ? 'Por favor, insira um e-mail válido.' : ''}
+              InputProps={{ className: 'bg-slate-50 rounded-xl' }}
             />
             
             <TextField
@@ -86,7 +86,7 @@ export function Login() {
               variant="outlined"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              InputProps={{ className: "bg-slate-50 rounded-xl" }}
+              InputProps={{ className: 'bg-slate-50 rounded-xl' }}
             />
 
             <Button 

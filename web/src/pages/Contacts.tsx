@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { useContacts } from "../hooks/useContacts";
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { useContacts } from '../hooks/useContacts';
 import { 
   Button, TextField, Dialog, DialogActions, DialogContent, 
   DialogTitle, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, IconButton 
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import toast from "react-hot-toast";
+import toast from 'react-hot-toast';
 
 export function Contacts() {
   const { id } = useParams<{ id: string }>();
@@ -20,8 +20,8 @@ export function Contacts() {
   const { contacts, loading, addContact, removeContact } = useContacts(id);
   
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [nameError, setNameError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
 
@@ -29,8 +29,8 @@ export function Contacts() {
     setNameError(false);
     setPhoneError(false);
 
-    if (!name) { setNameError(true); toast.error("Nome é obrigatório"); return; }
-    if (!phone) { setPhoneError(true); toast.error("Telefone é obrigatório"); return; }
+    if (!name) { setNameError(true); toast.error('Nome é obrigatório'); return; }
+    if (!phone) { setPhoneError(true); toast.error('Telefone é obrigatório'); return; }
 
     const duplicatePhone = contacts.find(c => c.phone === phone);
     if (duplicatePhone) {
@@ -42,10 +42,10 @@ export function Contacts() {
     try {
       await addContact(name, phone);
       setOpen(false);
-      setName("");
-      setPhone("");
+      setName('');
+      setPhone('');
     } catch (_err) {
-      console.error("Erro ao adicionar contato:", _err);
+      console.error('Erro ao adicionar contato:', _err);
     }
   };
 
@@ -59,7 +59,7 @@ export function Contacts() {
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-4">
           <IconButton 
-            onClick={() => navigate("/")} 
+            onClick={() => navigate('/')} 
             size="small" 
             className="text-slate-400 hover:text-blue-600 transition-colors"
           >
@@ -144,7 +144,7 @@ export function Contacts() {
           </Table>
         </TableContainer>
 
-        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ className: "rounded-2xl shadow-xl" }}>
+        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ className: 'rounded-2xl shadow-xl' }}>
           <form onSubmit={(e) => { e.preventDefault(); handleAdd(); }} noValidate>
             <DialogTitle className="font-extrabold text-slate-800 text-xl pt-6 pb-2">Adicionar Contato</DialogTitle>
             <DialogContent className="flex flex-col gap-5 mt-2">
@@ -153,13 +153,13 @@ export function Contacts() {
                 fullWidth required error={nameError} value={name}
                 onChange={(e) => { setName(e.target.value); if(nameError) setNameError(false); }}
                 autoFocus className="mt-2"
-                slotProps={{ input: { className: "rounded-xl" } }}
+                slotProps={{ input: { className: 'rounded-xl' } }}
               />
               <TextField
                 label="Telefone com DDD"
-                fullWidth required error={phoneError} helperText={phoneError ? "Este número já está na lista" : ""} value={phone}
+                fullWidth required error={phoneError} helperText={phoneError ? 'Este número já está na lista' : ''} value={phone}
                 onChange={(e) => { setPhone(e.target.value); if(phoneError) setPhoneError(false); }}
-                slotProps={{ input: { className: "rounded-xl" } }}
+                slotProps={{ input: { className: 'rounded-xl' } }}
               />
             </DialogContent>
             <DialogActions className="p-6 pt-4">

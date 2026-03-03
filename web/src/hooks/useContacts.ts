@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import { 
   collection, 
   query, 
@@ -9,10 +9,10 @@ import {
   doc, 
   serverTimestamp,
   Timestamp
-} from "firebase/firestore";
-import { db } from "../services/firebase";
-import { useAuth } from "./useAuth";
-import toast from "react-hot-toast";
+} from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { useAuth } from './useAuth';
+import toast from 'react-hot-toast';
 
 export interface Contact {
   id: string;
@@ -40,14 +40,14 @@ export function useContacts(connectionId: string | undefined) {
     let q;
     if (connectionId) {
       q = query(
-        collection(db, "contacts"),
-        where("connectionId", "==", connectionId),
-        where("userId", "==", user.uid)
+        collection(db, 'contacts'),
+        where('connectionId', '==', connectionId),
+        where('userId', '==', user.uid)
       );
     } else {
       q = query(
-        collection(db, "contacts"),
-        where("userId", "==", user.uid)
+        collection(db, 'contacts'),
+        where('userId', '==', user.uid)
       );
     }
 
@@ -60,8 +60,8 @@ export function useContacts(connectionId: string | undefined) {
       setContacts(data);
       setLoading(false);
     }, (_err) => {
-      console.error("Erro ao buscar contatos:", _err);
-      toast.error("Erro ao carregar os contatos.");
+      console.error('Erro ao buscar contatos:', _err);
+      toast.error('Erro ao carregar os contatos.');
       setLoading(false);
     });
 
@@ -72,28 +72,28 @@ export function useContacts(connectionId: string | undefined) {
     if (!user || !connectionId) return;
 
     try {
-      await addDoc(collection(db, "contacts"), {
+      await addDoc(collection(db, 'contacts'), {
         name,
         phone,
         connectionId,
         userId: user.uid,
         createdAt: serverTimestamp(),
       });
-      toast.success("Contato adicionado com sucesso!");
+      toast.success('Contato adicionado com sucesso!');
     } catch (_err) {
-      console.error("Erro ao adicionar contato:", _err);
-      toast.error("Erro ao adicionar o contato.");
+      console.error('Erro ao adicionar contato:', _err);
+      toast.error('Erro ao adicionar o contato.');
       throw _err;
     }
   };
 
   const removeContact = async (id: string) => {
     try {
-      await deleteDoc(doc(db, "contacts", id));
-      toast.success("Contato removido.");
+      await deleteDoc(doc(db, 'contacts', id));
+      toast.success('Contato removido.');
     } catch (_err) {
-      console.error("Erro ao remover contato:", _err);
-      toast.error("Erro ao remover o contato.");
+      console.error('Erro ao remover contato:', _err);
+      toast.error('Erro ao remover o contato.');
     }
   };
 

@@ -1,23 +1,23 @@
-import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { useConnections } from "../hooks/useConnections";
-import { useContacts, type Contact } from "../hooks/useContacts";
-import { useMessages, type Message } from "../hooks/useMessages";
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { useConnections } from '../hooks/useConnections';
+import { useContacts, type Contact } from '../hooks/useContacts';
+import { useMessages, type Message } from '../hooks/useMessages';
 import { 
   Button, TextField, Dialog, DialogActions, DialogContent, 
   DialogTitle, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, IconButton,
   Tabs, Tab, Box, MenuItem, Checkbox, ListItemText, OutlinedInput, Select, FormControl, InputLabel,
   Collapse, Typography
-} from "@mui/material";
+} from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Timestamp } from "firebase/firestore";
-import toast from "react-hot-toast";
+import { Timestamp } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 
 function MessageRow({ msg, onDelete, allContacts }: { msg: Message, onDelete: (id: string) => void, allContacts: Contact[] }) {
   const [open, setOpen] = useState(false);
@@ -25,8 +25,8 @@ function MessageRow({ msg, onDelete, allContacts }: { msg: Message, onDelete: (i
   const contactNames = useMemo(() => {
     return msg.contactIds.map(id => {
       const contact = allContacts.find(c => c.id === id);
-      return contact ? contact.name : "Contato removido";
-    }).join(", ");
+      return contact ? contact.name : 'Contato removido';
+    }).join(', ');
   }, [msg.contactIds, allContacts]);
 
   return (
@@ -92,10 +92,10 @@ export function Messages() {
   
   const [open, setOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
-  const [selectedConnId, setSelectedConnId] = useState("");
+  const [selectedConnId, setSelectedConnId] = useState('');
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
-  const [text, setText] = useState("");
-  const [scheduleTime, setScheduleTime] = useState("");
+  const [text, setText] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
 
   const { contacts: modalContacts } = useContacts(selectedConnId || undefined);
   
@@ -108,7 +108,7 @@ export function Messages() {
 
   const handleSend = async () => {
     if (!selectedConnId || selectedContactIds.length === 0 || !text) {
-      toast.error("Preencha todos os campos obrigatórios.");
+      toast.error('Preencha todos os campos obrigatórios.');
       return;
     }
 
@@ -116,7 +116,7 @@ export function Messages() {
     const scheduledAtDate = isScheduling ? new Date(scheduleTime) : new Date();
 
     if (isScheduling && scheduledAtDate <= new Date()) {
-      toast.error("O agendamento precisa ser para uma data futura.");
+      toast.error('O agendamento precisa ser para uma data futura.');
       return;
     }
 
@@ -133,17 +133,17 @@ export function Messages() {
   };
 
   const resetForm = () => {
-    setSelectedConnId("");
+    setSelectedConnId('');
     setSelectedContactIds([]);
-    setText("");
-    setScheduleTime("");
+    setText('');
+    setScheduleTime('');
   };
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-4">
-          <IconButton onClick={() => navigate("/")} size="small" className="text-slate-400 hover:text-blue-600">
+          <IconButton onClick={() => navigate('/')} size="small" className="text-slate-400 hover:text-blue-600">
             <ArrowBackIosNewIcon fontSize="small" />
           </IconButton>
           <div className="flex items-center gap-3 border-l pl-4 border-slate-200">
@@ -209,14 +209,14 @@ export function Messages() {
           </Table>
         </TableContainer>
 
-        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ className: "rounded-2xl" }}>
+        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ className: 'rounded-2xl' }}>
           <DialogTitle className="font-extrabold text-slate-800 text-xl">Configurar Disparo</DialogTitle>
           <DialogContent className="flex flex-col gap-6 pt-4">
             <TextField
               select label="Selecione o Remetente"
               fullWidth value={selectedConnId}
               onChange={(e) => setSelectedConnId(e.target.value)}
-              slotProps={{ input: { className: "rounded-xl" } }}
+              slotProps={{ input: { className: 'rounded-xl' } }}
             >
               {connections.map((c) => (
                 <MenuItem key={c.id} value={c.id}>{c.name} ({c.phone})</MenuItem>
@@ -244,7 +244,7 @@ export function Messages() {
               label="Texto da Mensagem"
               multiline rows={4} fullWidth value={text}
               onChange={(e) => setText(e.target.value)}
-              slotProps={{ input: { className: "rounded-xl" } }}
+              slotProps={{ input: { className: 'rounded-xl' } }}
             />
 
             <TextField
@@ -253,7 +253,7 @@ export function Messages() {
               fullWidth value={scheduleTime}
               onChange={(e) => setScheduleTime(e.target.value)}
               slotProps={{ 
-                input: { className: "rounded-xl" },
+                input: { className: 'rounded-xl' },
                 inputLabel: { shrink: true } 
               }}
               helperText="Deixe vazio para enviar agora"
@@ -262,7 +262,7 @@ export function Messages() {
           <DialogActions className="p-6">
             <Button onClick={() => setOpen(false)} className="text-slate-500 font-bold capitalize">Cancelar</Button>
             <Button variant="contained" onClick={handleSend} className="bg-blue-600 hover:bg-blue-700 rounded-xl px-8 font-bold capitalize">
-              {scheduleTime ? "Confirmar Agendamento" : "Enviar Agora"}
+              {scheduleTime ? 'Confirmar Agendamento' : 'Enviar Agora'}
             </Button>
           </DialogActions>
         </Dialog>

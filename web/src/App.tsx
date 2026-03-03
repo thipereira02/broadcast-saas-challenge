@@ -1,11 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
-import { Login } from "./pages/Login";
-import { Dashboard } from "./pages/Dashboard";
-import { Contacts } from "./pages/Contacts"
-import { PrivateRoute } from "./components/PrivateRoute";
-import { Messages } from "./pages/Messages";
-import { useAuth } from "./hooks/useAuth";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { Login } from './pages/Login';
+import { Dashboard } from './pages/Dashboard';
+import { Contacts } from './pages/Contacts';
+import { PrivateRoute } from './components/PrivateRoute';
+import { Messages } from './pages/Messages';
+import { useAuth } from './hooks/useAuth';
 
 export function App() {
   const { user, loading } = useAuth();
@@ -45,8 +45,8 @@ export function App() {
           path="/mensagens" 
           element={
             <PrivateRoute>
-                <Messages />
-              </PrivateRoute>
+              <Messages />
+            </PrivateRoute>
           } 
         />
         

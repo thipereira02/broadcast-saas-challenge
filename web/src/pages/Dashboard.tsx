@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { useAuth } from "../hooks/useAuth";
-import { useConnections } from "../hooks/useConnections";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { useConnections } from '../hooks/useConnections';
+import { useNavigate } from 'react-router-dom';
 import { 
   Button, TextField, Dialog, DialogActions, DialogContent, 
   DialogTitle, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Chip, IconButton,
   Switch, FormControlLabel
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SendIcon from '@mui/icons-material/Send';
-import toast from "react-hot-toast";
+import toast from 'react-hot-toast';
 
 export function Dashboard() {
   const { user, logout } = useAuth();
@@ -20,8 +20,8 @@ export function Dashboard() {
   const navigate = useNavigate();
   
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [nameError, setNameError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
 
@@ -29,8 +29,8 @@ export function Dashboard() {
     setNameError(false);
     setPhoneError(false);
 
-    if (!name) { setNameError(true); toast.error("Nome é obrigatório"); return; }
-    if (!phone) { setPhoneError(true); toast.error("Telefone é obrigatório"); return; }
+    if (!name) { setNameError(true); toast.error('Nome é obrigatório'); return; }
+    if (!phone) { setPhoneError(true); toast.error('Telefone é obrigatório'); return; }
 
     const duplicateName = connections.find(c => c.name.toLowerCase() === name.toLowerCase());
     const duplicatePhone = connections.find(c => c.phone === phone);
@@ -41,12 +41,12 @@ export function Dashboard() {
     try {
       await addConnection(name, phone);
       setOpen(false);
-      setName("");
-      setPhone("");
+      setName('');
+      setPhone('');
       setNameError(false);
       setPhoneError(false);
     } catch (_err) {
-      console.error("Erro ao adicionar conexão:", _err);
+      console.error('Erro ao adicionar conexão:', _err);
     }
   };
 
@@ -86,7 +86,7 @@ export function Dashboard() {
           <div className="flex gap-3">
             <Button 
               variant="outlined"
-              onClick={() => navigate("/mensagens")}
+              onClick={() => navigate('/mensagens')}
               startIcon={<SendIcon />}
               className="text-blue-600 border-blue-200 hover:bg-blue-50 rounded-xl px-5 py-2.5 font-bold capitalize"
             >
@@ -137,12 +137,12 @@ export function Dashboard() {
                     <TableCell className="text-slate-600 font-medium">{conn.phone}</TableCell>
                     <TableCell>
                       <Chip 
-                        label={conn.status === "active" ? "Ativo" : "Inativo"} 
+                        label={conn.status === 'active' ? 'Ativo' : 'Inativo'} 
                         size="small"
                         className={`font-bold text-[11px] rounded-lg transition-all ${
-                          conn.status === "active" 
-                            ? "bg-emerald-100 text-emerald-700 border border-emerald-200" 
-                            : "bg-slate-100 text-slate-400 border border-slate-200 opacity-60" 
+                          conn.status === 'active' 
+                            ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' 
+                            : 'bg-slate-100 text-slate-400 border border-slate-200 opacity-60' 
                         }`}
                       />
                     </TableCell>
@@ -160,7 +160,7 @@ export function Dashboard() {
                         <FormControlLabel
                           control={
                             <Switch
-                              checked={conn.status === "active"}
+                              checked={conn.status === 'active'}
                               onChange={() => toggleStatus(conn.id, conn.status)}
                               color="success"
                               size="small"
@@ -168,9 +168,9 @@ export function Dashboard() {
                           }
                           label={
                             <span className={`text-[11px] font-bold uppercase tracking-tighter hidden sm:block ${
-                              conn.status === "active" ? "text-emerald-600" : "text-slate-400"
+                              conn.status === 'active' ? 'text-emerald-600' : 'text-slate-400'
                             }`}>
-                              {conn.status === "active" ? "Online" : "Offline"}
+                              {conn.status === 'active' ? 'Online' : 'Offline'}
                             </span>
                           }
                           labelPlacement="start"
@@ -189,7 +189,7 @@ export function Dashboard() {
           </Table>
         </TableContainer>
 
-        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ className: "rounded-2xl shadow-xl" }}>
+        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ className: 'rounded-2xl shadow-xl' }}>
           <form onSubmit={(e) => { e.preventDefault(); handleAdd(); }} noValidate>
             <DialogTitle className="font-extrabold text-slate-800 text-xl pt-6 pb-2">Nova Conexão</DialogTitle>
             <DialogContent className="flex flex-col gap-5 mt-2">
@@ -198,13 +198,13 @@ export function Dashboard() {
                 fullWidth required error={nameError} value={name}
                 onChange={(e) => { setName(e.target.value); if(nameError) setNameError(false); }}
                 autoFocus className="mt-2"
-                slotProps={{ input: { className: "rounded-xl" } }}
+                slotProps={{ input: { className: 'rounded-xl' } }}
               />
               <TextField
                 label="Número com DDD (ex: 11999999999)"
-                fullWidth required error={phoneError} helperText={phoneError ? "Telefone já cadastrado" : ""} value={phone}
+                fullWidth required error={phoneError} helperText={phoneError ? 'Telefone já cadastrado' : ''} value={phone}
                 onChange={(e) => { setPhone(e.target.value); if(phoneError) setPhoneError(false); }}
-                slotProps={{ input: { className: "rounded-xl" } }}
+                slotProps={{ input: { className: 'rounded-xl' } }}
               />
             </DialogContent>
             <DialogActions className="p-6 pt-4">
