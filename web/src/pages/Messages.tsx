@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useConnections } from "../hooks/useConnections";
-import { useContacts } from "../hooks/useContacts";
+import { useContacts, type Contact } from "../hooks/useContacts";
 import { useMessages, type Message } from "../hooks/useMessages";
 import { 
   Button, TextField, Dialog, DialogActions, DialogContent, 
@@ -19,7 +19,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Timestamp } from "firebase/firestore";
 import toast from "react-hot-toast";
 
-function MessageRow({ msg, onDelete, allContacts }: { msg: Message, onDelete: (id: string) => void, allContacts: any[] }) {
+function MessageRow({ msg, onDelete, allContacts }: { msg: Message, onDelete: (id: string) => void, allContacts: Contact[] }) {
   const [open, setOpen] = useState(false);
 
   const contactNames = useMemo(() => {

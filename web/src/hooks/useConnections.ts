@@ -8,7 +8,8 @@ import {
   updateDoc, 
   deleteDoc, 
   doc, 
-  serverTimestamp 
+  serverTimestamp,
+  Timestamp
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { useAuth } from "./useAuth";
@@ -20,7 +21,7 @@ export interface Connection {
   phone: string;
   status: "active" | "inactive";
   userId: string;
-  createdAt?: any;
+  createdAt?: Timestamp;
 }
 
 export function useConnections() {
@@ -30,8 +31,10 @@ export function useConnections() {
 
   useEffect(() => {
     if (!user) {
-      setConnections([]);
-      setLoading(false);
+      Promise.resolve().then(() => {
+        setConnections([]);
+        setLoading(false);
+      });
       return;
     }
 
@@ -48,8 +51,8 @@ export function useConnections() {
       
       setConnections(data);
       setLoading(false);
-    }, (err) => {
-      console.error("Erro ao buscar conexões:", err);
+    }, (_err) => {
+      console.error("Erro ao buscar conexões:", _err);
       toast.error("Erro ao carregar suas conexões.");
       setLoading(false);
     });
@@ -69,22 +72,21 @@ export function useConnections() {
         createdAt: serverTimestamp(),
       });
       toast.success("Conexão criada com sucesso!");
-      
-    } catch (err) {
-      console.error(err);
+    } catch (_err) {
+      console.error("Erro ao criar conexão:", _err);
       toast.error("Erro ao criar conexão.");
-      throw err;
+      throw _err;
     }
   };
 
-  const toggleStatus = async (id: string, currentStatus: string) => {
+  const toggleStatus = async (id: string, currentStatus: Connection["status"]) => {
     try {
       const newStatus = currentStatus === "active" ? "inactive" : "active";
       const docRef = doc(db, "connections", id);
       await updateDoc(docRef, { status: newStatus });
       toast.success(`Conexão ${newStatus === "active" ? "ativada" : "desativada"}!`);
-    } catch (err) {
-      console.error(err);
+    } catch (_err) {
+      console.error("Erro ao atualizar status da conexão:", _err);
       toast.error("Erro ao atualizar o status.");
     }
   };
@@ -93,8 +95,8 @@ export function useConnections() {
     try {
       await deleteDoc(doc(db, "connections", id));
       toast.success("Conexão excluída permanentemente.");
-    } catch (err) {
-      console.error(err);
+    } catch (_err) {
+      console.error("Erro ao excluir conexão:", _err);
       toast.error("Erro ao excluir conexão.");
     }
   };

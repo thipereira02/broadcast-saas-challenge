@@ -1,5 +1,16 @@
 import { useState, useEffect } from "react";
-import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, Timestamp } from "firebase/firestore";
+import { 
+  collection, 
+  query, 
+  where, 
+  onSnapshot, 
+  addDoc, 
+  deleteDoc, 
+  doc, 
+  updateDoc, 
+  serverTimestamp, 
+  Timestamp 
+} from "firebase/firestore";
 import { db } from "../services/firebase";
 import { useAuth } from "./useAuth";
 import toast from "react-hot-toast";
@@ -20,9 +31,16 @@ export function useMessages() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      Promise.resolve().then(() => {
+        setMessages([]);
+        setLoading(false);
+      });
+      return;
+    }
 
     const q = query(collection(db, "messages"), where("userId", "==", user.uid));
+    
     const unsubscribe = onSnapshot(q, (snapshot) => {
         const data = snapshot.docs.map(doc => ({ 
             id: doc.id, 
@@ -34,11 +52,15 @@ export function useMessages() {
         const now = Date.now();
         data.forEach(async (msg) => {
             if (msg.status === 'scheduled' && msg.scheduledAt.toDate().getTime() <= now) {
-            await updateDoc(doc(db, "messages", msg.id), { status: 'sent' });
+              await updateDoc(doc(db, "messages", msg.id), { status: 'sent' });
             }
         });
 
         setMessages(data);
+        setLoading(false);
+    }, (_err) => {
+        console.error("Erro ao buscar mensagens:", _err);
+        toast.error("Erro ao sincronizar mensagens.");
         setLoading(false);
     });
 
@@ -54,7 +76,8 @@ export function useMessages() {
         createdAt: serverTimestamp()
       });
       toast.success(msgData.status === 'sent' ? "Mensagem enviada!" : "Mensagem agendada!");
-    } catch (err) {
+    } catch (_err) {
+      console.error("Erro ao salvar mensagem:", _err);
       toast.error("Erro ao salvar mensagem.");
     }
   };
@@ -63,7 +86,8 @@ export function useMessages() {
     try {
       await deleteDoc(doc(db, "messages", id));
       toast.success("Mensagem removida.");
-    } catch (err) {
+    } catch (_err) {
+      console.error("Erro ao remover mensagem:", _err);
       toast.error("Erro ao remover.");
     }
   };

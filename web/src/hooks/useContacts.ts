@@ -7,7 +7,8 @@ import {
   addDoc, 
   deleteDoc, 
   doc, 
-  serverTimestamp 
+  serverTimestamp,
+  Timestamp
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { useAuth } from "./useAuth";
@@ -19,7 +20,7 @@ export interface Contact {
   phone: string;
   connectionId: string;
   userId: string;
-  createdAt?: any;
+  createdAt?: Timestamp;
 }
 
 export function useContacts(connectionId: string | undefined) {
@@ -29,8 +30,10 @@ export function useContacts(connectionId: string | undefined) {
 
   useEffect(() => {
     if (!user) {
-      setContacts([]);
-      setLoading(false);
+      Promise.resolve().then(() => {
+        setContacts([]);
+        setLoading(false);
+      });
       return;
     }
 
@@ -56,8 +59,8 @@ export function useContacts(connectionId: string | undefined) {
       
       setContacts(data);
       setLoading(false);
-    }, (err) => {
-      console.error("Erro ao buscar contatos:", err);
+    }, (_err) => {
+      console.error("Erro ao buscar contatos:", _err);
       toast.error("Erro ao carregar os contatos.");
       setLoading(false);
     });
@@ -77,10 +80,10 @@ export function useContacts(connectionId: string | undefined) {
         createdAt: serverTimestamp(),
       });
       toast.success("Contato adicionado com sucesso!");
-    } catch (err) {
-      console.error(err);
+    } catch (_err) {
+      console.error("Erro ao adicionar contato:", _err);
       toast.error("Erro ao adicionar o contato.");
-      throw err;
+      throw _err;
     }
   };
 
@@ -88,8 +91,8 @@ export function useContacts(connectionId: string | undefined) {
     try {
       await deleteDoc(doc(db, "contacts", id));
       toast.success("Contato removido.");
-    } catch (err) {
-      console.error(err);
+    } catch (_err) {
+      console.error("Erro ao remover contato:", _err);
       toast.error("Erro ao remover o contato.");
     }
   };

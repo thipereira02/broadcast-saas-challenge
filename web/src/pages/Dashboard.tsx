@@ -45,7 +45,8 @@ export function Dashboard() {
       setPhone("");
       setNameError(false);
       setPhoneError(false);
-    } catch (err) {
+    } catch (_err) {
+      console.error("Erro ao adicionar conexão:", _err);
     }
   };
 

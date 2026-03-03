@@ -44,7 +44,8 @@ export function Contacts() {
       setOpen(false);
       setName("");
       setPhone("");
-    } catch (err) {
+    } catch (_err) {
+      console.error("Erro ao adicionar contato:", _err);
     }
   };
 
