@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
@@ -11,7 +12,6 @@ import { auth } from "../services/firebase";
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -22,28 +22,27 @@ export function useAuth() {
   }, []);
 
   const login = async (email: string, pass: string) => {
-    setError(null);
     try {
       await signInWithEmailAndPassword(auth, email, pass);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error("Erro ao fazer login. Verifique suas credenciais.");
       } else {
-        setError("Ocorreu um erro desconhecido no login.");
+        toast.error("Ocorreu um erro desconhecido no login.");
       }
       throw err;
     }
   };
 
   const register = async (email: string, pass: string) => {
-    setError(null);
     try {
       await createUserWithEmailAndPassword(auth, email, pass);
+      await signOut(auth);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error("Erro ao criar conta. Tente uma senha mais forte.");
       } else {
-        setError("Ocorreu um erro desconhecido no cadastro.");
+        toast.error("Ocorreu um erro desconhecido no cadastro.");
       }
       throw err;
     }
@@ -53,5 +52,5 @@ export function useAuth() {
     await signOut(auth);
   };
 
-  return { user, loading, error, login, register, logout };
+  return { user, loading, login, register, logout };
 }

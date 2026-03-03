@@ -1,21 +1,35 @@
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { TextField, Button, Typography, Paper } from "@mui/material";
 import { useAuth } from "../hooks/useAuth";
 
 export function Login() {
-  const { login, register, error } = useAuth();
+  const { login, register } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loadingAction, setLoadingAction] = useState(false);
 
   const handleSubmit = async () => {
+    if (!email || !email.includes("@") || !email.includes(".")) {
+      toast.error("Por favor, insira um e-mail válido.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+
     setLoadingAction(true);
     try {
       if (isLogin) {
         await login(email, password);
+        toast.success("Bem-vindo de volta!");
       } else {
         await register(email, password);
+        toast.success("Conta criada com sucesso! Faça o login para continuar.");
+        setIsLogin(true);
+        setPassword("");
       }
     } catch (err) {
       console.error(err);
@@ -41,6 +55,7 @@ export function Login() {
             handleSubmit();
           }} 
           className="flex flex-col gap-4"
+          noValidate
         >
           <TextField
             label="E-mail"
@@ -60,12 +75,6 @@ export function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-
-          {error && (
-            <Typography variant="body2" color="error" className="text-center">
-              {error}
-            </Typography>
-          )}
 
           <Button 
             type="submit" 
