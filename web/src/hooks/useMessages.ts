@@ -24,17 +24,22 @@ export function useMessages() {
 
     const q = query(collection(db, "messages"), where("userId", "==", user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Message[];
-      
-      const now = Date.now();
-      data.forEach(async (msg) => {
-        if (msg.status === 'scheduled' && msg.scheduledAt.toDate().getTime() <= now) {
-          await updateDoc(doc(db, "messages", msg.id), { status: 'sent' });
-        }
-      });
+        const data = snapshot.docs.map(doc => ({ 
+            id: doc.id, 
+            ...doc.data() 
+        })) as Message[];
 
-      setMessages(data);
-      setLoading(false);
+        data.sort((a, b) => b.scheduledAt.toMillis() - a.scheduledAt.toMillis());
+
+        const now = Date.now();
+        data.forEach(async (msg) => {
+            if (msg.status === 'scheduled' && msg.scheduledAt.toDate().getTime() <= now) {
+            await updateDoc(doc(db, "messages", msg.id), { status: 'sent' });
+            }
+        });
+
+        setMessages(data);
+        setLoading(false);
     });
 
     return () => unsubscribe();
