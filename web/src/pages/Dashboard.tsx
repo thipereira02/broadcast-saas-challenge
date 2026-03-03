@@ -8,10 +8,12 @@ import {
   TableContainer, TableHead, TableRow, Chip, IconButton 
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from "react-router-dom";
 
 export function Dashboard() {
   const { user, logout } = useAuth();
   const { connections, loading, addConnection, toggleStatus, removeConnection } = useConnections();
+  const navigate = useNavigate();
   
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -107,6 +109,15 @@ export function Dashboard() {
                       />
                     </TableCell>
                     <TableCell align="right">
+                      <Button 
+                        size="small" 
+                        color="primary"
+                        variant="outlined"
+                        onClick={() => navigate(`/conexoes/${conn.id}/contatos`)}
+                        className="mr-2 lowercase"
+                      >
+                        Contatos
+                      </Button>
                       <Button 
                         size="small" 
                         color={conn.status === "active" ? "warning" : "success"}
