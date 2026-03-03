@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 import { useConnections } from "../hooks/useConnections";
 import { 
@@ -15,13 +16,41 @@ export function Dashboard() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [nameError, setNameError] = useState(false);
+  const [phoneError, setPhoneError] = useState(false);
 
   const handleAdd = async () => {
-    if (!name || !phone) return;
-    await addConnection(name, phone);
-    setOpen(false);
-    setName("");
-    setPhone("");
+    setNameError(false);
+    setPhoneError(false);
+
+    if (!name) { setNameError(true); toast.error("Nome é obrigatório"); return; }
+    if (!phone) { setPhoneError(true); toast.error("Telefone é obrigatório"); return; }
+
+    const duplicateName = connections.find(c => c.name.toLowerCase() === name.toLowerCase());
+    const duplicatePhone = connections.find(c => c.phone === phone);
+
+    if (duplicateName) {
+      setNameError(true);
+      toast.error(`O nome "${name}" já está em uso.`);
+      return;
+    }
+
+    if (duplicatePhone) {
+      setPhoneError(true);
+      toast.error(`O número ${phone} já está cadastrado.`);
+      return;
+    }
+
+    try {
+      await addConnection(name, phone);
+      
+      setOpen(false); 
+      setName("");
+      setPhone("");
+      setNameError(false);
+      setPhoneError(false);
+    } catch (err) {
+    }
   };
 
   if (loading) {
@@ -32,7 +61,6 @@ export function Dashboard() {
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
         
-        {/* Cabeçalho */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Minhas Conexões</h1>
@@ -98,7 +126,6 @@ export function Dashboard() {
           </Table>
         </TableContainer>
 
-        {/* Modal de Criação */}
         <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
           <form onSubmit={(e) => { e.preventDefault(); handleAdd(); }} noValidate>
             <DialogTitle className="font-bold text-gray-800">Adicionar Conexão</DialogTitle>
@@ -107,8 +134,13 @@ export function Dashboard() {
                 label="Nome (ex: WhatsApp Matriz)"
                 fullWidth
                 required
+                error={nameError}
+                helperText={nameError ? "Nome duplicado ou inválido" : ""}
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if(nameError) setNameError(false);
+                }}
                 autoFocus
                 className="mt-2"
               />
@@ -116,8 +148,13 @@ export function Dashboard() {
                 label="Telefone (ex: 11999999999)"
                 fullWidth
                 required
+                error={phoneError}
+                helperText={phoneError ? "Telefone já cadastrado" : ""}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if(phoneError) setPhoneError(false);
+                }}
               />
             </DialogContent>
             <DialogActions className="p-4 border-t border-gray-100 mt-2">

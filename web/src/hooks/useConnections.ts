@@ -60,15 +60,6 @@ export function useConnections() {
   const addConnection = async (name: string, phone: string) => {
     if (!user) return;
 
-    const isDuplicate = connections.some(
-      (c) => c.phone === phone || c.name.toLowerCase() === name.toLowerCase()
-    );
-
-    if (isDuplicate) {
-      toast.error("Você já possui uma conexão com este nome ou telefone.");
-      return;
-    }
-
     try {
       await addDoc(collection(db, "connections"), {
         name,
@@ -78,9 +69,11 @@ export function useConnections() {
         createdAt: serverTimestamp(),
       });
       toast.success("Conexão criada com sucesso!");
+      
     } catch (err) {
       console.error(err);
       toast.error("Erro ao criar conexão.");
+      throw err;
     }
   };
 
