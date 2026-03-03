@@ -13,5 +13,5 @@ export function PrivateRoute({ children }: PrivateRouteProps) {
     return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
   }
 
-  return user ? <>{children}</> : <Navigate to="/" />;
+  return user ? <>{children}</> : <Navigate to="/login" />;
 }
